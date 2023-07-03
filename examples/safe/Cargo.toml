@@ -1,0 +1,18 @@
+[package]
+name = "safe"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license = "MIT"
+
+[dependencies]
+async-std = { version = "1.12", features = ["attributes"] }
+async-trait = "0.1"
+env_logger = "0.10"
+futures = "0.3.27"
+
+libp2p = { path = "../../libp2p", features = ["async-std", "noise", "macros", "autonat", "identify", "ping", "tcp", "yamux"] }
+multihash = "0.17.0"
+log = "0.4"
+clap = { version = "4.1.11", features = ["derive", "env"] }
+void = "1"
