@@ -6,12 +6,12 @@ signal_handler() {
 }
 trap signal_handler INT TERM
 
-echo 'usage: ./run.sh <node count>'
+echo 'usage: ./run.sh <node_count>'
 
 n=${1:-10}
 
-export RUST_LOG=safe
-local peers=""
+export RUST_LOG="safe"
+peers=""
 
 cargo build --bin=safe --release
 
