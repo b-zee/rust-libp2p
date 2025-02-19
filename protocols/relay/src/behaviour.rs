@@ -171,6 +171,7 @@ impl Default for Config {
 pub enum Event {
     /// An inbound reservation request has been accepted.
     ReservationReqAccepted {
+        connection_id: ConnectionId,
         src_peer_id: PeerId,
         /// Indicates whether the request replaces an existing reservation.
         renewed: bool,
@@ -184,7 +185,10 @@ pub enum Event {
         error: inbound_hop::Error,
     },
     /// An inbound reservation request has been denied.
-    ReservationReqDenied { src_peer_id: PeerId },
+    ReservationReqDenied {
+        connection_id: ConnectionId,
+        src_peer_id: PeerId,
+    },
     /// Denying an inbound reservation request has failed.
     #[deprecated(
         note = "Will be removed in favor of logging them internally, see <https://github.com/libp2p/rust-libp2p/issues/4757> for details."
@@ -194,9 +198,15 @@ pub enum Event {
         error: inbound_hop::Error,
     },
     /// An inbound reservation has timed out.
-    ReservationTimedOut { src_peer_id: PeerId },
+    ReservationTimedOut {
+        connection_id: ConnectionId,
+        src_peer_id: PeerId,
+    },
     /// A reservation has been removed.
-    ReservationRemoved { src_peer_id: PeerId },
+    ReservationRemoved {
+        connection_id: ConnectionId,
+        src_peer_id: PeerId,
+    },
     /// An inbound circuit request has been denied.
     CircuitReqDenied {
         src_peer_id: PeerId,
@@ -285,6 +295,7 @@ impl Behaviour {
 
                 self.queued_actions
                     .push_back(ToSwarm::GenerateEvent(Event::ReservationRemoved {
+                        connection_id,
                         src_peer_id: peer_id,
                     }));
             }
@@ -469,6 +480,7 @@ impl NetworkBehaviour for Behaviour {
 
                 self.queued_actions.push_back(ToSwarm::GenerateEvent(
                     Event::ReservationReqAccepted {
+                        connection_id: connection,
                         src_peer_id: event_source,
                         renewed,
                     },
@@ -486,6 +498,7 @@ impl NetworkBehaviour for Behaviour {
             handler::Event::ReservationReqDenied {} => {
                 self.queued_actions.push_back(ToSwarm::GenerateEvent(
                     Event::ReservationReqDenied {
+                        connection_id: connection,
                         src_peer_id: event_source,
                     },
                 ));
@@ -518,6 +531,7 @@ impl NetworkBehaviour for Behaviour {
 
                 self.queued_actions
                     .push_back(ToSwarm::GenerateEvent(Event::ReservationTimedOut {
+                        connection_id: connection,
                         src_peer_id: event_source,
                     }));
             }
